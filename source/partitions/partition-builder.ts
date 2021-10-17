@@ -3,6 +3,8 @@ import { IPartitionResolver } from "./i-partition-resolver";
 import { IPartitionResponse } from "./i-partition-response";
 import { IError } from "../interfaces/i-error";
 import * as dimensionalHelper from "@stdlib/ndarray";
+import { DimensionalData } from "../dimensional-data";
+import { IBulkResponse } from "../bulk-response";
 
 export class PartitionBuilder {
     private shape: bigint[];
@@ -41,6 +43,10 @@ export class PartitionBuilder {
         }
         return returnObject;
         //TODO PERF: Need to convert "@stdlib/ndarray"->sub2ind to accept Bigints to avoid converdion overheads
+    }
+
+    async build2(rawData: Array<DimensionalData>): Promise<IBulkResponse<Array<DimensionalData>, Array<IError<DimensionalData>>>> {
+        throw new Error("Not Implemented");
     }
 
     // async parse(partitionData: Array<IPartitionDataError>): Promise<IDimensionalData> {

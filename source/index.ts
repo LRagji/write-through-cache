@@ -1,63 +1,40 @@
+import { IBulkResponse } from "./bulk-response";
+import { DimensionalData } from "./dimensional-data";
+import { DimensionalIdentity } from "./identity/dimensional-identity";
+import { IMonotonicIdentityResolver } from "./identity/i-monotonic-identity-resolver";
 import { IError } from "./interfaces/i-error";
-import { IMonotonicIdentityResolver } from "./interfaces/i-monotonic-identity-resolver";
+import { LogStructureMeta } from "./log-structure/log-structure-meta";
+import { IPartitionResolver } from "./partitions/i-partition-resolver";
 import { PartitionBuilder } from "./partitions/partition-builder";
+import { IShardResolver } from "./shard/i-shard-resolver";
+import { Shard } from "./shard/shard";
 
 export class WriteThroughCache {
+    private dimensionalIdentity: DimensionalIdentity;
+    private partitionBuilder: PartitionBuilder;
+    private logStructureMeta: LogStructureMeta;
+    private shardResolvers: Shard;
 
-    constructor(private dimensionalIdentityResolvers: Array<IMonotonicIdentityResolver>, private builder: PartitionBuilder) { }
+    constructor(identityResolvers: Array<IMonotonicIdentityResolver>, partitionResolvers: Array<IPartitionResolver>, shardResolvere: Array<IShardResolver>, seperatorChar = "*") {
+        if ((identityResolvers.length !== partitionResolvers.length &&
+            shardResolvere.length !== partitionResolvers.length) ||
+            partitionResolvers.length === 0) {
+            throw new Error(`Configuration mismatch "identityResolvers"(${identityResolvers.length}), "partitionResolvers"(${partitionResolvers.length}), "shardResolvere"(${shardResolvere.length}) should match and not be 0.`);
+        }
+        this.dimensionalIdentity = new DimensionalIdentity(identityResolvers)
+        this.partitionBuilder = new PartitionBuilder(partitionResolvers, seperatorChar);
+        this.logStructureMeta = new LogStructureMeta();
+        this.shardResolvers = new Shard(shardResolvere);
+    }
 
-    async write(elements: Map<Array<string>, string>): Promise<any> {
-        const response = {
-            suceeded: {},
-            failed: new Map<Array<string>, IError<string>>(),
-            error: <unknown>null
+    async write(rawData: Array<DimensionalData>): Promise<IBulkResponse<Array<DimensionalData>, Array<IError<DimensionalData>>>> {
+        const identityResponse = await this.dimensionalIdentity.identify(rawData);
+        const lsmResponse = await this.logStructureMeta.appendMeta(identityResponse.succeeded);
+        const partitionResponse = await this.partitionBuilder.build2(lsmResponse.succeeded);
+        const shardResponse = await this.shardResolvers.write(partitionResponse.succeeded);
+        return {
+            succeeded: shardResponse.succeeded,
+            failed: Array(...identityResponse.failed, ...lsmResponse.failed, ...partitionResponse.failed, ...shardResponse.failed)
         };
-        if (elements == null) {
-            response.error = new Error(`Parameter "elements" is invalid: cannot be null or undefined.`);
-            return response;
-        }
-        if (elements.size <= 0) {
-            response.error = new Error(`Parameter "elements" is invalid: cannot be of size zero.`);
-            return response;
-        }
-        let dimenssions = Array.from(elements.keys());
-        let dimensionTranspose = new Array<Array<string>>();
-        dimenssions = dimenssions.filter(d => {
-            if (d.length !== this.dimensionalIdentityResolvers.length) {
-                const value: IError<string> = { "data": <string>elements.get(d), "error": new Error(`Parameter "elements" is invalid: dimensions${d.length} should match resolvers(${this.dimensionalIdentityResolvers.length}).`) };
-                response.failed.set(d, value);
-                return false;
-            }
-            else {
-                this.dimensionalIdentityResolvers.forEach((e, idx) => dimensionTranspose[idx].push(d[idx]));
-                return true;
-            }
-        });
-        const resolutionWaitHandles = this.dimensionalIdentityResolvers.map((resolver, idx) => resolver.resolve(dimensionTranspose[idx]));
-        const resolvedData = await Promise.all(resolutionWaitHandles);
-        const dimensionalData = new Map<Array<bigint>, string>();
-        dimenssions.forEach(d => {
-            let errorString = "";
-            const coordinates = d.map((str, idx) => {
-                const key = resolvedData[idx].get(str);
-                if (key == null || key.error !== null) {
-                    errorString += key?.error?.message || `Cannot find ${str} for dimension ${idx}`;
-                    return null;
-                }
-                else {
-                    return key.data;
-                }
-            });
-            if (errorString != "") {
-                const value: IError<string> = { "data": <string>elements.get(d), "error": new Error(`Resolving failed: ${errorString}.`) };
-                response.failed.set(d, value);
-            }
-            else {
-                dimensionalData.set(<Array<bigint>>coordinates, <string>elements.get(d));
-            }
-        });
-
-        const partitions = await this.builder.build(dimensionalData);
-
     }
 }
