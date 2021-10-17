@@ -1,0 +1,1 @@
+export interface IPartitionData extends Map<string, Map<bigint, string>> { };

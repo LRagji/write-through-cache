@@ -1,0 +1,44 @@
+{
+  "name": "write-through-cache",
+  "version": "0.0.1",
+  "description": "A simple write through cache for 2 dimensional data structures using redis, also be called as lsm data structure.",
+  "main": "./dist/index.js",
+  "scripts": {
+    "clean-build": "run-script-os",
+    "clean-build:macos": "rm -rf ./dist/",
+    "test": "nyc --reporter=html --reporter=text env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register ./tests/**/*.ts",
+    "build": "npm run clean-build && tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LRagji/write-through-cache.git"
+  },
+  "keywords": [
+    "Redis",
+    "Timeseries",
+    "LSM",
+    "write",
+    "through",
+    "cahce",
+    "Laukik"
+  ],
+  "author": "Laukik",
+  "license": "SEE LICENSE IN license.md",
+  "bugs": {
+    "url": "https://github.com/LRagji/write-through-cache/issues"
+  },
+  "homepage": "https://github.com/LRagji/write-through-cache#readme",
+  "dependencies": {
+    "@stdlib/ndarray": "0.0.13"
+  },
+  "devDependencies": {
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^16.11.1",
+    "cross-env": "^7.0.3",
+    "mocha": "^9.1.3",
+    "nyc": "^15.1.0",
+    "run-script-os": "^1.1.6",
+    "ts-node": "^10.3.0",
+    "typescript": "^4.4.4"
+  }
+}
