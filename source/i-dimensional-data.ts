@@ -1,4 +1,4 @@
 export interface IDimensionalData {
     payload: string;
-    dimensions: Array<string>;
+    dimensions: Array<bigint>;
 }
