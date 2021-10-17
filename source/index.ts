@@ -1,8 +1,8 @@
-import { IBulkResponse } from "./bulk-response";
-import { DimensionalData } from "./dimensional-data";
+import { IBulkResponse } from "./i-bulk-response";
+import { IDimensionalData } from "./i-dimensional-data";
 import { DimensionalIdentity } from "./identity/dimensional-identity";
 import { IMonotonicIdentityResolver } from "./identity/i-monotonic-identity-resolver";
-import { IError } from "./interfaces/i-error";
+import { IError } from "./i-error";
 import { LogStructureMeta } from "./log-structure/log-structure-meta";
 import { IPartitionResolver } from "./partitions/i-partition-resolver";
 import { PartitionBuilder } from "./partitions/partition-builder";
@@ -27,7 +27,7 @@ export class WriteThroughCache {
         this.shardResolvers = new Shard(shardResolvere);
     }
 
-    async write(rawData: Array<DimensionalData>): Promise<IBulkResponse<Array<DimensionalData>, Array<IError<DimensionalData>>>> {
+    async write(rawData: Array<IDimensionalData>): Promise<IBulkResponse<Array<IDimensionalData>, Array<IError<IDimensionalData>>>> {
         const identityResponse = await this.dimensionalIdentity.identify(rawData);
         const lsmResponse = await this.logStructureMeta.appendMeta(identityResponse.succeeded);
         const partitionResponse = await this.partitionBuilder.build2(lsmResponse.succeeded);

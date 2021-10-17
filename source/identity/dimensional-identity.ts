@@ -1,13 +1,13 @@
-import { IError } from "../interfaces/i-error";
+import { IError } from "../i-error";
 import { IMonotonicIdentityResolver } from "../identity/i-monotonic-identity-resolver";
-import { DimensionalData } from "../dimensional-data";
-import { IBulkResponse } from "../bulk-response";
+import { IDimensionalData } from "../i-dimensional-data";
+import { IBulkResponse } from "../i-bulk-response";
 
 export class DimensionalIdentity {
 
     constructor(private dimensionalIdentityResolvers: Array<IMonotonicIdentityResolver>) { }
 
-    async identify(rawData: Array<DimensionalData>): Promise<IBulkResponse<Array<DimensionalData>, Array<IError<DimensionalData>>>> {
+    async identify(rawData: Array<IDimensionalData>): Promise<IBulkResponse<Array<IDimensionalData>, Array<IError<IDimensionalData>>>> {
         throw new Error("Not Implemented");
         // const response = {
         //     suceeded: {},

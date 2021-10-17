@@ -1,14 +1,13 @@
-import { IBulkResponse } from "../bulk-response";
-import { DimensionalData } from "../dimensional-data";
-import { IError } from "../interfaces/i-error";
-import { IShardClient } from "../interfaces/i-shard-client";
+import { IBulkResponse } from "../i-bulk-response";
+import { IDimensionalData } from "../i-dimensional-data";
+import { IError } from "../i-error";
 import { IShardResolver } from "./i-shard-resolver";
 
 export class Shard {
 
     constructor(private shardresolvers: Array<IShardResolver>) { }
 
-    async write(data: Array<DimensionalData>, createIfNotFound: boolean = false): Promise<IBulkResponse<Array<DimensionalData>, Array<IError<DimensionalData>>>> {
+    async write(data: Array<IDimensionalData>, createIfNotFound: boolean = false): Promise<IBulkResponse<Array<IDimensionalData>, Array<IError<IDimensionalData>>>> {
         throw new Error("Not Implemented");
     }
 }

@@ -1,9 +1,9 @@
-import { IBulkResponse } from "../bulk-response";
-import { DimensionalData } from "../dimensional-data";
-import { IError } from "../interfaces/i-error";
+import { IBulkResponse } from "../i-bulk-response";
+import { IDimensionalData } from "../i-dimensional-data";
+import { IError } from "../i-error";
 
 export class LogStructureMeta {
-    async appendMeta(partitionedData: Array<DimensionalData>): Promise<IBulkResponse<Array<DimensionalData>, Array<IError<DimensionalData>>>> {
+    async appendMeta(partitionedData: Array<IDimensionalData>): Promise<IBulkResponse<Array<IDimensionalData>, Array<IError<IDimensionalData>>>> {
         throw new Error("Not Implemented.");
     }
 }
