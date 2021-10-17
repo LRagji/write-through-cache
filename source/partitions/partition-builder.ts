@@ -1,7 +1,7 @@
-import { IDimensionalData } from "./interfaces/i-dimensional-data";
-import { IPartitionResolver } from "./interfaces/partitions/i-partition-resolver";
-import { IPartitionResponse } from "./interfaces/partitions/i-partition-response";
-import { IError } from "./interfaces/i-error";
+import { IDimensionalData } from "../interfaces/i-dimensional-data";
+import { IPartitionResolver } from "./i-partition-resolver";
+import { IPartitionResponse } from "./i-partition-response";
+import { IError } from "../interfaces/i-error";
 import * as dimensionalHelper from "@stdlib/ndarray";
 
 export class PartitionBuilder {

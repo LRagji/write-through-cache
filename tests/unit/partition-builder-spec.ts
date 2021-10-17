@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { PartitionBuilder } from '../../source/partition-builder'
+import { PartitionBuilder } from '../../source/partitions/partition-builder'
 
 describe('"PartitionBuilder" unit tests', () => {
     const xResolver = {
